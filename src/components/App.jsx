@@ -2,6 +2,7 @@ import React from "react";
 // import { moviesData } from "../moviesData";
 import MovieItem from "./MovieItem";
 import MovieTabs from "./MovieTabs";
+import MoviePage from "./MoviePages";
 import { API_URL, API_KEY_3 } from "../utils/api";
 
 // UI = fn(state, props)
@@ -15,35 +16,46 @@ class App extends React.Component {
     this.state = {
       movies: [],
       moviesWillWatch: [],
-      sort_by: "popularity.desc"
+      sort_by: "popularity.desc",
+      page: 1,
+      totalPages: 0
     };
   }
 
   componentDidMount() {
     console.log("didMount");
+    this.getMovies();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    //console.log("prev", prevProps, prevState);
+    //console.log("this", this.props, this.state);
+    if (prevState.sort_by !== this.state.sort_by) {
+      this.getMovies();
+    }
+  }
+
+  getMovies = () => {
     fetch(
-      `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}}`
+      `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}&page=${this.state.page}}`
     )
       .then((response) => {
-        console.log("fetch");
         return response.json();
       })
       .then((data) => {
-        console.log("fetch", data);
+        console.log("fetch", data.totalPages);
         this.setState({
-          movies: data.results
+          movies: data.results,
+          totalPages: data.totalPages
         });
       });
-  }
+  };
 
   deleteMovie = (movie) => {
-    console.log(movie.id);
     const updateMovies = this.state.movies.filter(
       (item) => item.id !== movie.id
     );
-    console.log(updateMovies);
 
-    // this.state.movies = updateMovies;
     this.setState({
       movies: updateMovies
     });
@@ -75,7 +87,7 @@ class App extends React.Component {
   };
 
   render() {
-    console.log("render", this);
+    //console.log("render", this);
     return (
       <div className="container">
         <div className="row mt-4">
@@ -88,10 +100,10 @@ class App extends React.Component {
                 />
               </div>
             </div>
-            <div className="row">
+            <div className="row mb-4">
               {this.state.movies.map((movie) => {
                 return (
-                  <div className="col-6 mb-4" key={movie.id}>
+                  <div className="col-4" key={movie.id}>
                     <MovieItem
                       data={movie}
                       deleteMovie={this.deleteMovie}
@@ -101,6 +113,14 @@ class App extends React.Component {
                   </div>
                 );
               })}
+            </div>
+            <div className="row mb-4">
+              <div className="col-md-6 offset-md-3">
+                <MoviePage
+                  page={this.state.page}
+                  totalPages={this.state.totalPages}
+                />
+              </div>
             </div>
           </div>
           <div className="col-3">
