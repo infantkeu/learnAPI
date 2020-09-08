@@ -4,6 +4,7 @@ import MovieItem from "./MovieItem";
 import MovieTabs from "./MovieTabs";
 import MoviePage from "./MoviePages";
 import { API_URL, API_KEY_3 } from "../utils/api";
+//import classNames from "../utils/classNames";
 
 // UI = fn(state, props)
 
@@ -30,23 +31,26 @@ class App extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     //console.log("prev", prevProps, prevState);
     //console.log("this", this.props, this.state);
-    if (prevState.sort_by !== this.state.sort_by) {
+    if (
+      prevState.sort_by !== this.state.sort_by ||
+      prevState.page !== this.state.page
+    ) {
       this.getMovies();
     }
   }
 
   getMovies = () => {
     fetch(
-      `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}&page=${this.state.page}}`
+      `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}&page=${this.state.page}`
     )
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        console.log("fetch", data.totalPages);
+        console.log("fetch", data);
         this.setState({
           movies: data.results,
-          totalPages: data.totalPages
+          totalPages: data.total_pages
         });
       });
   };
@@ -86,6 +90,12 @@ class App extends React.Component {
     });
   };
 
+  changePage = (value) => {
+    this.setState({
+      page: this.state.page + value
+    });
+  };
+
   render() {
     //console.log("render", this);
     return (
@@ -119,6 +129,7 @@ class App extends React.Component {
                 <MoviePage
                   page={this.state.page}
                   totalPages={this.state.totalPages}
+                  changePage={this.changePage}
                 />
               </div>
             </div>
