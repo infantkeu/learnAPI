@@ -135,7 +135,9 @@ class App extends React.Component {
             </div>
           </div>
           <div className="col-3">
-            <h4>Will Watch: {this.state.moviesWillWatch.length} movies</h4>
+            <h4>
+              Will Watch Movies: {this.state.moviesWillWatch.length} movies
+            </h4>
             <ul className="list-group">
               {this.state.moviesWillWatch.map((movie) => (
                 <li key={movie.id} className="list-group-item">
